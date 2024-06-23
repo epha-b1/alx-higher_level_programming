@@ -1,26 +1,27 @@
 #!/usr/bin/python3
-'''task 4 script'''
+"""
+This script lists all cities from
+the database `hbtn_0e_4_usa`.
+"""
 
-import MySQLdb
-import sys
+import MySQLdb as db
+from sys import argv
 
 if __name__ == '__main__':
-    '''lists all cities from db'''
-    username = sys.argv[1]
-    password = sys.argv[2]
-    db_name = sys.argv[3]
-    host = 'localhost'
-    port = 3306
+    """
+    Access the database and get the cities
+    from the database.
+    """
 
-    db = MySQLdb.connect(host=host, user=username, passwd=password,
-                         db=db_name, port=port)
-    cur = db.cursor()
-    cur.execute('SELECT c.id, c.name, s.name FROM cities c LEFT ' +
-                'JOIN states s ON c.state_id = s.id ORDER BY c.id ASC;')
-    result = cur.fetchall()
-    cur.close()
-    db.close()
+    db_connect = db.connect(host="localhost", port=3306,
+                            user=argv[1], passwd=argv[2], db=argv[3])
 
-    if result:
-        for row in result:
+    with db_connect.cursor() as db_cursor:
+        db_cursor.execute("SELECT cities.id, cities.name, states.name \
+                                FROM cities JOIN states ON cities.state_id \
+                                = states.id ORDER BY cities.id ASC")
+        rows_selected = db_cursor.fetchall()
+
+    if rows_selected is not None:
+        for row in rows_selected:
             print(row)
